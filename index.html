@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Словарь</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+            margin-top: 24px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #4f46e5;
+        }
+
+        .stats {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #4b5563;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .stat-total { color: #4f46e5; }
+        .stat-learned { color: #16a34a; }
+        .stat-progress { color: #2563eb; }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .tab-btn.active {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .tab-btn.inactive {
+            background: white;
+            color: #4f46e5;
+        }
+
+        .tab-btn:active {
+            transform: scale(0.98);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            margin: 12px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #4f46e5;
+            transition: width 0.3s;
+        }
+
+        .word-counter {
+            color: #6b7280;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .word-card {
+            background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+            border-radius: 8px;
+            padding: 48px 24px;
+            margin-bottom: 24px;
+            color: white;
+            text-align: center;
+        }
+
+        .word-label {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 12px;
+        }
+
+        .word-text {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            word-break: break-word;
+        }
+
+        .speak-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .speak-btn:active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .translation-card {
+            background: linear-gradient(135deg, #4ade80 0%, #06b6d4 100%);
+            border-radius: 8px;
+            padding: 32px 24px;
+            margin-bottom: 24px;
+            color: white;
+            text-align: center;
+        }
+
+        .translation-text {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .toggle-btn {
+            width: 100%;
+            background: #f3f4f6;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 24px;
+            color: #1f2937;
+            transition: background 0.3s;
+        }
+
+        .toggle-btn:active {
+            background: #e5e7eb;
+        }
+
+        .buttons-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-secondary {
+            background: #d1d5db;
+            color: #1f2937;
+        }
+
+        .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary:active:not(:disabled) {
+            background: #9ca3af;
+        }
+
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:active {
+            background: #4338ca;
+        }
+
+        .btn-success {
+            background: #16a34a;
+            color: white;
+            width: 100%;
+        }
+
+        .btn-success:active {
+            background: #15803d;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            font-size: 12px;
+            padding: 8px 12px;
+        }
+
+        .btn-danger:active {
+            background: #dc2626;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        input {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+
+        .word-list {
+            max-height: 400px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .word-item {
+            padding: 12px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .word-item.learned {
+            background: #dcfce7;
+        }
+
+        .word-item.unlearned {
+            background: #f3f4f6;
+        }
+
+        .word-item-text {
+            flex: 1;
+        }
+
+        .word-item-english {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .word-item-russian {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .checkmark {
+            color: #16a34a;
+            font-size: 18px;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .header-row h2 {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Словарь</h1>
+            <p>Изучение иностранных слов</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-label">Всего слов</div>
+                <div class="stat-value stat-total" id="totalWords">8</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Выучено</div>
+                <div class="stat-value stat-learned" id="learnedWords">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Прогресс</div>
+                <div class="stat-value stat-progress" id="progress">0%</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('learn')">Обучение</button>
+            <button class="tab-btn inactive" onclick="switchTab('list')">Список</button>
+            <button class="tab-btn inactive" onclick="switchTab('add')">Добавить</button>
+        </div>
+
+        <!-- TAB: LEARN -->
+        <div id="learn" class="tab-content active">
+            <div class="card">
+                <div class="word-counter">
+                    Слово <span id="currentNum">1</span> из <span id="totalNum">8</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                </div>
+
+                <div class="word-card">
+                    <div class="word-label">Английское слово</div>
+                    <div class="word-text" id="englishWord">Hello</div>
+                    <button class="speak-btn" onclick="speak(app.words[app.currentIndex].english, 'en')">🔊 Прослушать</button>
+                </div>
+
+                <button class="toggle-btn" onclick="toggleTranslation()">➡️ Показать перевод</button>
+
+                <div id="translationContainer" style="display: none;">
+                    <div class="translation-card">
+                        <div class="word-label">Русский перевод</div>
+                        <div class="translation-text" id="russianWord">Привет</div>
+                        <button class="speak-btn" onclick="speak(app.words[app.currentIndex].russian, 'ru')">🔊 Прослушать</button>
+                    </div>
+                </div>
+
+                <div class="buttons-row">
+                    <button class="btn btn-secondary" id="prevBtn" onclick="prevWord()">⬅️ Назад</button>
+                    <button class="btn btn-secondary" id="nextBtn" onclick="nextWord()">Далее ➡️</button>
+                </div>
+
+                <button class="btn btn-primary" id="learnBtn" onclick="markAsLearned()">Отметить как выученное</button>
+            </div>
+        </div>
+
+        <!-- TAB: LIST -->
+        <div id="list" class="tab-content">
+            <div class="card">
+                <div class="header-row">
+                    <h2>Все слова</h2>
+                    <button class="btn btn-danger" onclick="resetProgress()">🔄 Сбросить</button>
+                </div>
+                <div class="word-list" id="wordList"></div>
+            </div>
+        </div>
+
+        <!-- TAB: ADD -->
+        <div id="add" class="tab-content">
+            <div class="card">
+                <h2 style="margin-bottom: 16px; color: #1f2937;">Добавить новое слово</h2>
+                <div class="input-group">
+                    <input type="text" id="englishInput" placeholder="Английское слово">
+                </div>
+                <div class="input-group">
+                    <input type="text" id="russianInput" placeholder="Русский перевод">
+                </div>
+                <button class="btn btn-primary" onclick="addWord()">➕ Добавить слово</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const app = {
+            words: [
+                { id: 1, english: 'Hello', russian: 'Привет', learned: false },
+                { id: 2, english: 'Goodbye', russian: 'До свидания', learned: false },
+                { id: 3, english: 'Thank you', russian: 'Спасибо', learned: false },
+                { id: 4, english: 'Please', russian: 'Пожалуйста', learned: false },
+                { id: 5, english: 'Water', russian: 'Вода', learned: false },
+                { id: 6, english: 'Book', russian: 'Книга', learned: false },
+                { id: 7, english: 'Friend', russian: 'Друг', learned: false },
+                { id: 8, english: 'Beautiful', russian: 'Красивый', learned: false },
+            ],
+            currentIndex: 0,
+            showTranslation: false
+        };
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active');
+                el.classList.add('inactive');
+            });
+            
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+            event.target.classList.remove('inactive');
+
+            if (tab === 'list') {
+                renderWordList();
+            }
+        }
+
+        function updateStats() {
+            const learned = app.words.filter(w => w.learned).length;
+            const total = app.words.length;
+            const percent = total > 0 ? Math.round((learned / total) * 100) : 0;
+
+            document.getElementById('totalWords').textContent = total;
+            document.getElementById('learnedWords').textContent = learned;
+            document.getElementById('progress').textContent = percent + '%';
+        }
+
+        function updateCardView() {
+            const word = app.words[app.currentIndex];
+            document.getElementById('englishWord').textContent = word.english;
+            document.getElementById('russianWord').textContent = word.russian;
+            document.getElementById('currentNum').textContent = app.currentIndex + 1;
+            document.getElementById('totalNum').textContent = app.words.length;
+
+            const percent = ((app.currentIndex + 1) / app.words.length) * 100;
+            document.getElementById('progressBar').style.width = percent + '%';
+
+            document.getElementById('prevBtn').disabled = app.currentIndex === 0;
+            document.getElementById('nextBtn').disabled = app.currentIndex === app.words.length - 1;
+
+            const learnBtn = document.getElementById('learnBtn');
+            if (word.learned) {
+                learnBtn.textContent = '✓ Выучено';
+                learnBtn.classList.remove('btn-primary');
+                learnBtn.classList.add('btn-success');
+            } else {
+                learnBtn.textContent = 'Отметить как выученное';
+                learnBtn.classList.add('btn-primary');
+                learnBtn.classList.remove('btn-success');
+            }
+
+            app.showTranslation = false;
+            document.getElementById('translationContainer').style.display = 'none';
+            document.querySelector('.toggle-btn').textContent = '➡️ Показать перевод';
+
+            updateStats();
+        }
+
+        function nextWord() {
+            if (app.currentIndex < app.words.length - 1) {
+                app.currentIndex++;
+                updateCardView();
+            }
+        }
+
+        function prevWord() {
+            if (app.currentIndex > 0) {
+                app.currentIndex--;
+                updateCardView();
+            }
+        }
+
+        function toggleTranslation() {
+            app.showTranslation = !app.showTranslation;
+            const container = document.getElementById('translationContainer');
+            const btn = document.querySelector('.toggle-btn');
+            
+            if (app.showTranslation) {
+                container.style.display = 'block';
+                btn.textContent = '🔽 Скрыть';
+            } else {
+                container.style.display = 'none';
+                btn.textContent = '➡️ Показать перевод';
+            }
+        }
+
+        function markAsLearned() {
+            app.words[app.currentIndex].learned = !app.words[app.currentIndex].learned;
+            updateCardView();
+            nextWord();
+        }
+
+        function speak(text, lang) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang === 'en' ? 'en-US' : 'ru-RU';
+            speechSynthesis.speak(utterance);
+        }
+
+        function renderWordList() {
+            const list = document.getElementById('wordList');
+            list.innerHTML = app.words.map(word => `
+                <div class="word-item ${word.learned ? 'learned' : 'unlearned'}">
+                    <div class="word-item-text">
+                        <div class="word-item-english">${word.english}</div>
+                        <div class="word-item-russian">${word.russian}</div>
+                    </div>
+                    ${word.learned ? '<div class="checkmark">✓</div>' : ''}
+                </div>
+            `).join('');
+        }
+
+        function addWord() {
+            const eng = document.getElementById('englishInput').value.trim();
+            const rus = document.getElementById('russianInput').value.trim();
+
+            if (eng && rus) {
+                app.words.push({
+                    id: Date.now(),
+                    english: eng,
+                    russian: rus,
+                    learned: false
+                });
+                document.getElementById('englishInput').value = '';
+                document.getElementById('russianInput').value = '';
+                updateStats();
+                alert('Слово добавлено!');
+            } else {
+                alert('Заполните оба поля');
+            }
+        }
+
+        function resetProgress() {
+            if (confirm('Вы уверены? Это сбросит весь прогресс.')) {
+                app.words.forEach(w => w.learned = false);
+                updateStats();
+                renderWordList();
+            }
+        }
+
+        updateCardView();
+    </script>
+</body>
+</html>
